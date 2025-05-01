@@ -9,18 +9,22 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class UserDetails {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int userId;
+	private Long userId;
 	@Column(nullable = false)
 	private String firstName;
 	@Column(nullable = false)
 	private String lastName;
 	@Column(unique = true, nullable = false)
+	@Email
+	@NotBlank
 	private String emailId;
 	@Column(nullable = false)
 	private String password;
@@ -29,10 +33,10 @@ public class UserDetails {
 	@Column(nullable = false)
 	private String address;
 	
-	public int getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(int userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getFirstName() {
@@ -71,12 +75,6 @@ public class UserDetails {
 	}
 	public void setAddress(String address) {
 		this.address = address;
-	}
-	
-	@Override
-	public String toString() {
-		return "UserDetails [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId="
-				+ emailId + ", password=" + password + ", role=" + role + ", address=" + address + "]";
 	}
 	
 }
