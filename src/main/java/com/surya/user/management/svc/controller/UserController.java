@@ -1,7 +1,9 @@
 package com.surya.user.management.svc.controller;
 
-import org.springframework.http.HttpStatus;
+import com.surya.user.management.svc.model.LoginRequest;
+import com.surya.user.management.svc.model.LoginResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,7 @@ import com.surya.user.management.svc.model.UserDetails;
 import com.surya.user.management.svc.model.UserResponse;
 import com.surya.user.management.svc.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,8 +35,12 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<UserResponse> registerUser(@RequestBody @Valid UserDetails userdetails) throws UserAlreadyExistException{
-		ResponseEntity<UserResponse> response = userservice.registerUser(userdetails);
-		return response;
+        return userservice.registerUser(userdetails);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> loginUser(@RequestBody @Valid LoginRequest request){
+		return userservice.verifyUser(request);
 	}
 
 }
