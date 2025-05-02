@@ -10,7 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,8 @@ import com.surya.user.management.svc.model.UserResponse;
 import com.surya.user.management.svc.repository.UserRepository;
 
 import jakarta.validation.Valid;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -60,7 +62,16 @@ public class UserService {
 	public ResponseEntity<LoginResponse> verifyUser(@Valid LoginRequest request) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
-		if(authentication.isAuthenticated()){
+
+
+		Optional<String> role = authentication.getAuthorities().stream()
+				.findFirst()
+				.map(GrantedAuthority::getAuthority); // or throw an exception if preferred
+
+		logger.info("Role details: {}", role);
+
+		if(authentication.isAuthenticated() && role.isPresent() &&
+				role.get().equalsIgnoreCase(Role.CUSTOMER.toString())){
 			request.setRole(Role.CUSTOMER);
 			String jwtToken = jwtService.generateJwtToken(request);
 			logger.info("Jwt Token: {}", jwtToken);

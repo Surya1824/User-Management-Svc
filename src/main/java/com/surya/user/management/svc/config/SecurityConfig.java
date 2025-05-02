@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,17 +21,21 @@ public class SecurityConfig {
 
 	private final SecureUserDetailService secureUserDetailService;
 
-    public SecurityConfig(SecureUserDetailService secureUserDetailService) {
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(SecureUserDetailService secureUserDetailService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.secureUserDetailService = secureUserDetailService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
+		.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(request -> request.requestMatchers("/customer/register",
 				"/customer/login").permitAll().anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
-				.csrf(csrf -> csrf.disable());
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		return httpSec.build();
 	}
