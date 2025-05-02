@@ -33,10 +33,13 @@ public class UserService {
 
 	private final AuthenticationManager authenticationManager;
 
-	public UserService(UserRepository userRepo, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+	private final JWTService jwtService;
+
+	public UserService(UserRepository userRepo, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JWTService jwtService) {
 		this.userRepo = userRepo;
 		this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
 	public ResponseEntity<UserResponse> registerUser(@Valid UserDetails userdetails) throws UserAlreadyExistException {
@@ -58,7 +61,10 @@ public class UserService {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
 		if(authentication.isAuthenticated()){
-			return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse("1w1sq5s1q1sq111a1151.151wdw4Dw4Ds444aX.1xa4d5a5d4a4da51dsaf8fer", true));
+			request.setRole(Role.CUSTOMER);
+			String jwtToken = jwtService.generateJwtToken(request);
+			logger.info("Jwt Token: {}", jwtToken);
+			return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(jwtToken, true));
 		}
 		logger.error("Bad Credentials");
 		throw new BadCredentialsException("Bad Credentials");
