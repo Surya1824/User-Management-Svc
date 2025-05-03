@@ -2,6 +2,7 @@ package com.surya.user.management.svc.service;
 
 import com.surya.user.management.svc.model.LoginRequest;
 import com.surya.user.management.svc.model.LoginResponse;
+import com.surya.user.management.svc.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import com.surya.user.management.svc.repository.UserRepository;
 
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -44,12 +46,12 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-	public ResponseEntity<UserResponse> registerUser(@Valid UserDetails userdetails) throws UserAlreadyExistException {
+	public ResponseEntity<UserResponse> registerUser(@Valid UserDetails userdetails, Role role) throws UserAlreadyExistException {
 
 		if (userRepo.findByEmailId(userdetails.getEmailId()).isPresent()) {
 			throw new UserAlreadyExistException("User Already Registered");
 		} else {
-			userdetails.setRole(Role.CUSTOMER);// default role
+			userdetails.setRole(role);// default role
 			userdetails.setPassword(passwordEncoder.encode(userdetails.getPassword()));
 			UserDetails saveDetails = userRepo.save(userdetails);
 			logger.info("Saved user Details: {}", saveDetails);
@@ -59,19 +61,17 @@ public class UserService {
 
 	}
 
-	public ResponseEntity<LoginResponse> verifyUser(@Valid LoginRequest request) {
+	public ResponseEntity<LoginResponse> verifyUser(@Valid LoginRequest request, Role requestRole) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
 
-		Optional<String> role = authentication.getAuthorities().stream()
-				.findFirst()
-				.map(GrantedAuthority::getAuthority);
+		Optional<String> role = UserUtils.getRole(authentication.getAuthorities());
 
 		logger.info("Role details: {}", role);
 
 		if(authentication.isAuthenticated() && role.isPresent() &&
-				role.get().equalsIgnoreCase(Role.CUSTOMER.toString())){
-			request.setRole(Role.CUSTOMER);
+				role.get().equalsIgnoreCase(requestRole.toString())){
+			request.setRole(requestRole);
 			String jwtToken = jwtService.generateJwtToken(request);
 			logger.info("Jwt Token: {}", jwtToken);
 			return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(jwtToken, true));

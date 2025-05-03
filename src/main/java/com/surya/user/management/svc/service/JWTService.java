@@ -1,26 +1,26 @@
 package com.surya.user.management.svc.service;
 
 import com.surya.user.management.svc.model.LoginRequest;
+import com.surya.user.management.svc.utils.UserUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
 public class JWTService {
+
+    public final Logger logger = LoggerFactory.getLogger(JWTService.class);
 
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
@@ -52,7 +52,6 @@ public class JWTService {
     }
 
     private <T> T extractClaims(String jwtToken, Function<Claims,T> claimsResolver) {
-
         Claims claims = extractClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
@@ -62,7 +61,18 @@ public class JWTService {
     }
 
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        return isTokenExpired(jwtToken);
+        return isTokenExpired(jwtToken) && isValidRole(jwtToken, userDetails);
+    }
+
+    private boolean isValidRole(String jwtToken, UserDetails userDetails) {
+        Optional<String> role = UserUtils.getRole(userDetails.getAuthorities());
+        String roleExtracted = extractRole(jwtToken);
+        logger.info("User Detail Role: {} Role Extracted from token: {}", role, roleExtracted);
+        return role.isPresent() && role.get().equalsIgnoreCase(roleExtracted);
+    }
+
+    private String extractRole(String jwtToken) {
+        return extractClaims(jwtToken, c ->  c.get("role", String.class));
     }
 
     private boolean isTokenExpired(String jwtToken) {

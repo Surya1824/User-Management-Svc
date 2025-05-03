@@ -33,7 +33,7 @@ public class SecurityConfig {
 		httpSec
 		.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(request -> request.requestMatchers("/customer/register",
-				"/customer/login").permitAll().anyRequest().authenticated())
+				"/customer/login", "/admin/register", "/admin/login").permitAll().anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		
