@@ -63,10 +63,9 @@ public class UserService {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
 
-
 		Optional<String> role = authentication.getAuthorities().stream()
 				.findFirst()
-				.map(GrantedAuthority::getAuthority); // or throw an exception if preferred
+				.map(GrantedAuthority::getAuthority);
 
 		logger.info("Role details: {}", role);
 

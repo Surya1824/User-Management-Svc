@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
 
         final String bearerJwtToke = request.getHeader("Authorization");
 
-        if(bearerJwtToke == null && !bearerJwtToke.startsWith("Bearer")){
+        if(bearerJwtToke == null || !bearerJwtToke.startsWith("Bearer")){
             filterChain.doFilter(request,response);
             return;
         }
@@ -64,5 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
         }
 
         filterChain.doFilter(request,response);
+        
     }
 }
