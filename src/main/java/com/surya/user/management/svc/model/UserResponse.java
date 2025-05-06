@@ -4,21 +4,27 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
-	
+
+	private String error;
 	private String message;
-    private boolean registered;
+    private boolean success;
     private Long userId; // Optional
 
     public UserResponse(String message, boolean success) {
         this.message = message;
-        this.registered = success;
+        this.success = success;
     }
 
     public UserResponse(String message, boolean success, Long userId) {
         this.message = message;
-        this.registered = success;
+        this.success = success;
         this.userId = userId;
     }
+
+	public UserResponse(String error, String message) {
+		this.error = error;
+		this.message = message;
+	}
 
 	public String getMessage() {
 		return message;
@@ -28,12 +34,12 @@ public class UserResponse {
 		this.message = message;
 	}
 
-	public boolean isRegistered() {
-		return registered;
+	public boolean isSuccess() {
+		return success;
 	}
 
-	public void setRegistered(boolean registered) {
-		this.registered = registered;
+	public void setSuccess(boolean success) {
+		this.success = success;
 	}
 
 	public Long getUserId() {
@@ -44,4 +50,11 @@ public class UserResponse {
 		this.userId = userId;
 	}
 
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
 }

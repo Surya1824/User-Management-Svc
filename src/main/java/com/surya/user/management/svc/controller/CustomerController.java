@@ -1,14 +1,12 @@
 package com.surya.user.management.svc.controller;
 
 import com.surya.user.management.svc.enums.Role;
+import com.surya.user.management.svc.exceptions.RoleMismatchError;
 import com.surya.user.management.svc.model.LoginRequest;
 import com.surya.user.management.svc.model.LoginResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.surya.user.management.svc.exceptions.UserAlreadyExistException;
 import com.surya.user.management.svc.model.UserDetails;
@@ -28,10 +26,16 @@ public class CustomerController {
 	}
 
 	@GetMapping
-	public String greetCustomer() {
-		return "Hello, How is your Day?";
+	public String greetCustomer(@RequestHeader(name = "User-Type") String userType) throws RoleMismatchError {
+		System.out.println("User type: " + userType);
+		if(userType.equalsIgnoreCase(Role.CUSTOMER.name())){
+			return "Hello, How is your Day?";
+		}else {
+			throw new RoleMismatchError("You do not have the required role to access this resource.");
+		}
+
 	}
-	
+
 	@PostMapping("/register")
 	public ResponseEntity<UserResponse> registerUser(@RequestBody @Valid UserDetails userdetails) throws UserAlreadyExistException{
         return userservice.registerUser(userdetails, Role.CUSTOMER);
