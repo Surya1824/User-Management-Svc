@@ -4,15 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
+		<artifactId>user-management-svc</artifactId>
 		<version>3.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.surya</groupId>
 	<artifactId>service-discovery-hub</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>service-discovery-hub</name>
-	<description>Centralized registry for E commers micro services</description>
+	<name>user-management-svc</name>
+	<description>Role based User Registration and Login</description>
 	<url/>
 	<licenses>
 		<license/>
