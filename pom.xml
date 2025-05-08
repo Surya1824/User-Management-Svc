@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
-		<artifactId>user-management-svc</artifactId>
+		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.surya</groupId>
-	<artifactId>service-discovery-hub</artifactId>
+	<artifactId>user-management-svc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>user-management-svc</name>
 	<description>Role based User Registration and Login</description>
